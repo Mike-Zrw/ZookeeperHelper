@@ -2,34 +2,41 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using ZooKeeperNet;
 
 namespace ZookeeperHelper
 {
+    /// <summary>
+    /// 客户端连接的监听
+    /// </summary>
     public class ConnectWatcher : IWatcher
     {
-        private ZooKeeperClient _Client;
-        public ConnectWatcher(ZooKeeperClient client)
+        private AutoResetEvent connectWaitEvent;
+
+
+        public ConnectWatcher(AutoResetEvent connectWaitEvent)
         {
-            _Client = client;
+            this.connectWaitEvent = connectWaitEvent;
         }
+
         public void Process(WatchedEvent @event)
         {
             if (@event.State == KeeperState.SyncConnected)
             {
                 Console.WriteLine("服务器连接成功。");
-                _Client.ConnectSuccess();
+                connectWaitEvent.Set(); 
             }
             if (@event.State == KeeperState.Disconnected)
             {
                 Console.WriteLine("服务器中断重连。");
-                _Client.ReConnect();
+                ZooKeeperClient.ReConnect();
             }
             if (@event.State == KeeperState.Expired)
             {
                 Console.WriteLine("连接已超时重连。");
-                _Client.ReConnect();
+                ZooKeeperClient.ReConnect();
             }
         }
     }
@@ -42,7 +49,7 @@ namespace ZookeeperHelper
         {
             if (@event.Type == EventType.NodeDeleted)
             {
-                ZooKeeperCustomer.ServiceDisConnect(@event.Path);
+                ServiceHelper.ServiceDisConnect(@event.Path);
             }
         }
     }

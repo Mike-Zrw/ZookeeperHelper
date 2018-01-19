@@ -8,8 +8,21 @@ namespace ZookeeperHelper
 {
     public class ConstData
     {
-        internal static readonly string ServiceName = "testser";
-        internal static string ServiceUrlRoot = "/root/ServiceUrls";
-        internal static string ConnectionString = "localhost:2181";
+        /// <summary>
+        /// 服务名称
+        /// </summary>
+        public static readonly string ServiceName ="ser1";
+        /// <summary>
+        /// 服务的根目录
+        /// </summary>
+        public static string ServiceUrlRoot = "/root/service_providers";
+        /// <summary>
+        /// zk地址
+        /// </summary>
+        public static string ConnectionString = "localhost:2181";
+        /// <summary>
+        /// 服务名字缓存前缀
+        /// </summary>
+        public static string CacheSerName_Prefix = "ZooKeeperServiceUrl_serName";
     }
 }

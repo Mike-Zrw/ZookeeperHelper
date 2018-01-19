@@ -11,74 +11,82 @@ namespace ZookeeperHelper
 {
     public class ZooKeeperClient
     {
-        private readonly string connectionString;
-        private AutoResetEvent ConnectWaitEvent = new AutoResetEvent(false);
+        private static readonly string connectionString = ConstData.ConnectionString;
+        public static ZooKeeper Instance;
+        static ZooKeeperClient()
+        {
+            AutoResetEvent ConnectWaitEvent = new AutoResetEvent(false);
+            Instance = new ZooKeeperNet.ZooKeeper(connectionString, new TimeSpan(0, 0, 30), new ConnectWatcher(ConnectWaitEvent));
+            WaitHandle.WaitAll(new WaitHandle[] { ConnectWaitEvent });
+            Init();
+        }
 
-        private static ZooKeeper _Instance;
-        public ZooKeeper Instance
+        /// <summary>
+        /// 初始化基本的目录
+        /// </summary>
+        public static void Init()
         {
-            get { return _Instance; }
-        }
-        public bool ConnectSuccess()
-        {
-            this.ConnectWaitEvent.Set();
-            return true;
-        }
-        public ZooKeeperClient(string connectionString)
-        {
-            if (_Instance == null)
+            try
             {
-                ConnectWaitEvent = new AutoResetEvent(false);
-                this.connectionString = connectionString;
-                _Instance = new ZooKeeperNet.ZooKeeper(connectionString, new TimeSpan(0, 0, 30), new ConnectWatcher(this));
-                WaitHandle.WaitAll(new WaitHandle[] { ConnectWaitEvent });
+                if (null == Instance.Exists("/root", false))
+                {
+                    Console.WriteLine("root目录不存在，已创建");
+                    Instance.Create("/root", "root".GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Persistent);
+                }
+                if (null == Instance.Exists(ConstData.ServiceUrlRoot, false))
+                {
+                    Console.WriteLine("ServiceUrls目录不存在，已创建");
+                    Instance.Create(ConstData.ServiceUrlRoot, "Config Serveice Urls".GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Persistent);
+                }
             }
+            catch (Exception ex)
+            {
+
+            }
+
         }
-        //public void Init()
-        //{
-        //    try
-        //    {
-        //        if (null == Instance.Exists("/root", false))
-        //        {
-        //            Instance.Create("/root", "root".GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Persistent);
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //    }
-        //    if (null == Instance.Exists(ConstData.ServiceUrlRoot, false))
-        //    {
-        //        Console.WriteLine("ServiceUrls不存在，已创建");
-        //        Instance.Create(ConstData.ServiceUrlRoot, "Config the Serveice Urls".GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Persistent);
-        //    }
-        //}
         /// <summary>  
         /// 重连  
         /// </summary>  
         /// <returns></returns>  
-        public bool ReConnect()
+        public static bool ReConnect()
         {
-            ConnectWaitEvent = new AutoResetEvent(false);
-            _Instance = new ZooKeeperNet.ZooKeeper(connectionString, new TimeSpan(0, 0, 30), new ConnectWatcher(this));
+            AutoResetEvent ConnectWaitEvent = new AutoResetEvent(false);
+            Instance = new ZooKeeperNet.ZooKeeper(connectionString, new TimeSpan(0, 0, 30), new ConnectWatcher(ConnectWaitEvent));
             WaitHandle.WaitAll(new WaitHandle[] { ConnectWaitEvent });
             return true;
         }
-
-        public void CreateEphemeralSequentialNode(string path, string data)
+        /// <summary>
+        /// 创建一个临时的自增长的节点
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="data"></param>
+        public static void CreateEphemeralSequentialNode(string path, string data)
         {
-            Instance.Create(path, data.GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.EphemeralSequential);
+            var stat = Instance.Exists(path, false);
+            if (stat == null)
+            {
+                Instance.Create(path, data.GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Ephemeral);
+                Instance.SetData(path, data.GetBytes(), 0);
+            }
+            else
+            {
+                Instance.Create(path, data.GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Ephemeral);
+                Instance.SetData(path, data.GetBytes(), 2);
+            }
         }
-        public string GetData(string path,IWatcher watcher)
+        /// <summary>
+        /// 获取节点绑定的data
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="watcher"></param>
+        /// <returns></returns>
+        public static string GetData(string path, IWatcher watcher)
         {
             byte[] data = Instance.GetData(path, watcher, new Stat());
             string result = System.Text.Encoding.Default.GetString(data);
             return result;
         }
-        public List<string> GetChildren(string path)
-        {
-            List<string> childs = Instance.GetChildren(path, false).ToList();
-            return childs;
-
-        }
+       
     }
 }

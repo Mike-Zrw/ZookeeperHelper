@@ -11,9 +11,10 @@ namespace ZkService
     {
         static void Main(string[] args)
         {
-            ZooKeeperService.RegisterService("localhost:2021", "testser1");
-            ZooKeeperService.RegisterService("localhost:2022", "testser2");
-            Console.WriteLine("ok");
+            string serpath = ServiceHelper.RegisterService("localhost:2021", ConstData.ServiceName);
+            Console.WriteLine("成功注册服务：" + ConstData.ServiceName + "\t" + serpath);
+            string serpath2 = ServiceHelper.RegisterService("localhost:2022", ConstData.ServiceName);
+            Console.WriteLine("成功注册服务：" + ConstData.ServiceName + "\t" + serpath2);
             Console.Read();
         }
     }

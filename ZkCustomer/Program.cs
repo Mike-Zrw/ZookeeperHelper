@@ -12,15 +12,8 @@ namespace ZkCustomer
     {
         static void Main(string[] args)
         {
-            string url = ZooKeeperCustomer.GetServiceUrl("testser1");
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 10000; i++)
-            {
-                 url = ZooKeeperCustomer.GetServiceUrl("testser1");
-            }
-            Console.WriteLine(url);
-            Console.WriteLine(sw.ElapsedMilliseconds);
+            string url = ServiceHelper.GetServiceUrl(ConstData.ServiceName);
+            Console.WriteLine(string.Format("获取服务{0}地址：{1}", ConstData.ServiceName, url));
             Console.ReadLine();
         }
     }

@@ -1,0 +1,10 @@
+/.vs
+/packages
+/ZkCustomer/obj
+/ZkCustomer/bin
+/ZkService/obj
+/ZkService/bin
+/ZookeeperDemo/bin
+/ZookeeperDemo/obj
+/ZookeeperHelper/bin
+/ZookeeperHelper/obj

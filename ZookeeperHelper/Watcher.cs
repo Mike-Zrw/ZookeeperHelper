@@ -49,7 +49,7 @@ namespace ZookeeperHelper
         {
             if (@event.Type == EventType.NodeDeleted)
             {
-                ServiceHelper.ServiceDisConnect(@event.Path);
+                ServiceHelper.SerDisConnectListener(@event.Path);
             }
         }
     }

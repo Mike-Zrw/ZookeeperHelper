@@ -32,20 +32,6 @@ namespace ZookeeperHelper
             return serpath;
         }
         /// <summary>
-        /// 创建一个服务节点
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="serName"></param>
-        /// <returns>服务节点路径</returns>
-        public static string CreateServiceNode(string url, string serName)
-        {
-            string serPath = BuildServicePath(serName, url);
-            ZooKeeperClient.Instance.Create(serPath, null, Ids.OPEN_ACL_UNSAFE, CreateMode.Ephemeral);
-            return serPath;
-        }
-
-
-        /// <summary>
         /// 获取服务地址
         /// </summary>
         /// <param name="serName">服务名称</param>
@@ -63,16 +49,30 @@ namespace ZookeeperHelper
             }
             string url = urls[0];
             string serPath = BuildServicePath(serName, url);
-            ZooKeeperClient.Instance.Exists(serPath, new CustomerWatcher());
+            ZooKeeperClient.Instance.Exists(serPath, new CustomerWatcher());//监听服务的连接状态
             CacheHelper.SetCache(ConstData.CacheSerName_Prefix + serName, url, new TimeSpan(0, 0, 60));
             CacheHelper.SetCache(ConstData.CacheSerName_Prefix + serPath, serName, new TimeSpan(0, 0, 60));
             return url;
         }
         /// <summary>
-        /// 某个服务的连接断开,客户端删除该服务的缓存
+        /// 创建一个服务节点
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="serName"></param>
+        /// <returns>服务节点路径</returns>
+        private static string CreateServiceNode(string url, string serName)
+        {
+            string serPath = BuildServicePath(serName, url);
+            ZooKeeperClient.Instance.Create(serPath, null, Ids.OPEN_ACL_UNSAFE, CreateMode.Ephemeral);
+            return serPath;
+        }
+
+      
+        /// <summary>
+        /// 监听某个服务的连接断开,客户端删除该服务的缓存
         /// </summary>
         /// <param name="serPath"></param>
-        public static void ServiceDisConnect(string serPath)
+        public static void SerDisConnectListener(string serPath)
         {
             string serName = CacheHelper.GetCache<string>(ConstData.CacheSerName_Prefix + serPath);
             if (serName != null)

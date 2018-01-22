@@ -9,22 +9,23 @@ using ZooKeeperNet;
 
 namespace ZookeeperHelper
 {
-    public class ZooKeeperClient
+    /// <summary>
+    /// 负责提供zookeeper的连接实例,并维护zookeeper的连接
+    /// </summary>
+    internal class ZooKeeperClient
     {
-        private static readonly string connectionString = ConstData.ConnectionString;
         public static ZooKeeper Instance;
         static ZooKeeperClient()
         {
             AutoResetEvent ConnectWaitEvent = new AutoResetEvent(false);
-            Instance = new ZooKeeperNet.ZooKeeper(connectionString, new TimeSpan(0, 0, 30), new ConnectWatcher(ConnectWaitEvent));
+            Instance = new ZooKeeperNet.ZooKeeper(ConstData.ConnectionString, new TimeSpan(0, 0, 30), new ConnectWatcher(ConnectWaitEvent));
             WaitHandle.WaitAll(new WaitHandle[] { ConnectWaitEvent });
             Init();
         }
-
         /// <summary>
         /// 初始化基本的目录
         /// </summary>
-        public static void Init()
+        private static void Init()
         {
             try
             {
@@ -52,41 +53,9 @@ namespace ZookeeperHelper
         public static bool ReConnect()
         {
             AutoResetEvent ConnectWaitEvent = new AutoResetEvent(false);
-            Instance = new ZooKeeperNet.ZooKeeper(connectionString, new TimeSpan(0, 0, 30), new ConnectWatcher(ConnectWaitEvent));
+            Instance = new ZooKeeperNet.ZooKeeper(ConstData.ConnectionString, new TimeSpan(0, 0, 30), new ConnectWatcher(ConnectWaitEvent));
             WaitHandle.WaitAll(new WaitHandle[] { ConnectWaitEvent });
             return true;
         }
-        /// <summary>
-        /// 创建一个临时的自增长的节点
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="data"></param>
-        public static void CreateEphemeralSequentialNode(string path, string data)
-        {
-            var stat = Instance.Exists(path, false);
-            if (stat == null)
-            {
-                Instance.Create(path, data.GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Ephemeral);
-                Instance.SetData(path, data.GetBytes(), 0);
-            }
-            else
-            {
-                Instance.Create(path, data.GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Ephemeral);
-                Instance.SetData(path, data.GetBytes(), 2);
-            }
-        }
-        /// <summary>
-        /// 获取节点绑定的data
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="watcher"></param>
-        /// <returns></returns>
-        public static string GetData(string path, IWatcher watcher)
-        {
-            byte[] data = Instance.GetData(path, watcher, new Stat());
-            string result = System.Text.Encoding.Default.GetString(data);
-            return result;
-        }
-       
     }
 }

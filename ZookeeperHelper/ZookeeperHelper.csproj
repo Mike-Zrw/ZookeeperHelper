@@ -52,9 +52,6 @@
   <ItemGroup>
     <Compile Include="CacheHelper.cs" />
     <Compile Include="ConstData.cs" />
-    <Compile Include="ReadAssemblyInfo.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Watcher.cs" />
     <Compile Include="ZooKeeperClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

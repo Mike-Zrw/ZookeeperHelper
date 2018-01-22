@@ -39,6 +39,9 @@ namespace ZookeeperHelper
                     Console.WriteLine("ServiceUrls目录不存在，已创建");
                     Instance.Create(ConstData.ServiceUrlRoot, "Config Serveice Urls".GetBytes(), Ids.OPEN_ACL_UNSAFE, CreateMode.Persistent);
                 }
+                string lockPath = "/Locks" + LockType.Default;
+                if (ZooKeeperClient.Instance.Exists(lockPath, false) == null)
+                    ZooKeeperClient.Instance.Create(lockPath, null, Ids.OPEN_ACL_UNSAFE, CreateMode.Persistent);
             }
             catch (Exception ex)
             {

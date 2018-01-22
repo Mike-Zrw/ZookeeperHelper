@@ -25,4 +25,9 @@ namespace ZookeeperHelper
         /// </summary>
         public static string CacheSerName_Prefix = "ZooKeeperServiceUrl_serName";
     }
+
+    public enum LockType
+    {
+        Default=1
+    }
 }

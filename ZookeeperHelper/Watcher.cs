@@ -40,6 +40,20 @@ namespace ZookeeperHelper
             }
         }
     }
+    public class LockWatcher : IWatcher
+    {
+        public LockWatcher()
+        {
+        }
+
+        public void Process(WatchedEvent @event)
+        {
+            if (@event.Type == EventType.NodeDeleted)
+            {
+                LockHelper.ReleaseLock(@event.Path);
+            }
+        }
+    }
     /// <summary>
     /// 客户端对于服务地址变动的监听
     /// </summary>

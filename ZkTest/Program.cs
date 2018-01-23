@@ -14,12 +14,12 @@ namespace ZkTest
         static void Main(string[] args)
         {
             List<Task> tsks = new List<Task>();
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 20; i++)
             {
                 tsks.Add(Task.Run(() => {
                     string path=LockHelper.GetLock();
                     index++;
-                    LockHelper.ReleaseLock(path);
+                    LockHelper.Unlock(path);
                 }));
             }
             Task.WaitAll(tsks.ToArray());

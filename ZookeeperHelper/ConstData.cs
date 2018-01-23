@@ -25,9 +25,14 @@ namespace ZookeeperHelper
         /// </summary>
         public static string CacheSerName_Prefix = "ZooKeeperServiceUrl_serName";
     }
-
+    /// <summary>
+    /// 锁类型
+    /// </summary>
     public enum LockType
     {
+        /// <summary>
+        /// 默认
+        /// </summary>
         Default=1
     }
 }
